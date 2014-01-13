@@ -1,0 +1,73 @@
+
+package com.chinadim.boss.controller;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.chinadim.boss.entity.BaseEntity;
+
+import freemarker.template.SimpleSequence;
+
+@Controller
+@RequestMapping("/")
+public class TestController {
+
+	//模拟测试实体
+	private static List recordService = new ArrayList();
+
+	static {
+		BaseEntity record = new BaseEntity();
+		for(int i=0;i<5;i++){
+			record.setName("hello"+i);
+			recordService.add(record);
+		}
+	}
+	
+    @RequestMapping(method = RequestMethod.GET, value = "list")
+    public ModelAndView listRecords(ModelMap model) throws SQLException {
+        model.addAttribute("names", new SimpleSequence(recordService));
+        return new ModelAndView("list", model);
+    }
+    @RequestMapping(method = RequestMethod.GET, value = "add")
+    public ModelAndView addRecord(ModelMap model) throws SQLException {
+        return new ModelAndView("add", model);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "new")
+    public ModelAndView addRecord(ModelMap model, @RequestParam(value = "name") String name
+            , @RequestParam(value = "age") int age) throws SQLException {
+    	BaseEntity record = new BaseEntity();
+        record.setName(name);
+        recordService.add(record);
+        return new ModelAndView("add", model);
+    }
+    //linkid=$(LINKID)&content=$(MOCMD)&spnumber=10667799921&mobile=$(PHONE)&status=DELIVRD
+    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST}, value = "sms")
+    public ModelAndView sms(ModelMap model,String linkid,String content,
+    		String spnumber,String mobile,String status){
+    	
+    	System.out.println("linkid:"+linkid);
+    	System.out.println("content:"+content);
+    	System.out.println("spnumber:"+spnumber);
+    	System.out.println("mobile:"+mobile);
+    	System.out.println("status:"+status);
+    	if(!StringUtils.isEmpty(linkid)&&!StringUtils.isEmpty(content)&&
+    			!StringUtils.isEmpty(mobile)&&!StringUtils.isEmpty(spnumber)
+    			&&!StringUtils.isEmpty(status)){
+    		model.addAttribute("ok");
+    	}else{
+    		model.addAttribute("error");
+    	}
+    	return new ModelAndView("sms",model);
+    }
+
+}
